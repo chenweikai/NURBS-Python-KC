@@ -17,6 +17,7 @@ geomdl/cli
 geomdl/shapes
 geomdl/iga
 geomdl/evaluators
+output/
 .ipynb*
 *.pyc
 *.c
