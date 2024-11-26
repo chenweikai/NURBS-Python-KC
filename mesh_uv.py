@@ -159,8 +159,12 @@ def get_uv_vert_idx_map(faces, uv_faces, uvs):
     return uv_to_geo_id_map
 
 
-def dump_components_into_pcd(comps, uv_to_geo_id_map, verts, out_folder_dir, min_part_size=20):
+def dump_components_into_pcd(comps, uv_to_geo_id_map, verts, out_folder_dir, min_part_size=1):
     os.makedirs(out_folder_dir, exist_ok=True)
+    ply_folder = os.path.join(out_folder_dir, "ply")
+    pcd_folder = os.path.join(out_folder_dir, "pcd")
+    os.makedirs(ply_folder, exist_ok=True)
+    os.makedirs(pcd_folder, exist_ok=True)
     verts = np.asarray(verts)
     for idx, comp in enumerate(comps):
         geo_vids = []
@@ -174,15 +178,17 @@ def dump_components_into_pcd(comps, uv_to_geo_id_map, verts, out_folder_dir, min
         if len(unique_vert) < min_part_size:
             continue
         cur_verts = verts[geo_vids]
-        file_name = os.path.join(out_folder_dir, f"part_{idx}.ply")
+        file_ply_name = os.path.join(ply_folder, f"part_{idx}.ply")
+        file_pcd_name = os.path.join(pcd_folder, f"part_{idx}.pcd")
         import open3d as o3d
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(cur_verts)
         vert_colors = np.random.rand(1, 3)
         vert_colors = np.repeat(vert_colors, repeats=cur_verts.shape[0], axis=0)
         pcd.colors = o3d.utility.Vector3dVector(vert_colors)
-        o3d.io.write_point_cloud(file_name, pcd)
-        print("Saved part vertices to ", file_name)
+        o3d.io.write_point_cloud(file_ply_name, pcd)
+        o3d.io.write_point_cloud(file_pcd_name, pcd)
+        print(f"Saved part vertices to {file_ply_name} and {file_pcd_name}")
         # pdb.set_trace()
 
 
